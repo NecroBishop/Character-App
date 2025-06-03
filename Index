@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .nav-bar {
+            display: flex;
+            background-color: #333;
+            justify-content: space-evenly;
+            padding: 10px 0;
+        }
+        .nav-bar button {
+            color: white;
+            background-color: #444;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .nav-bar button.active {
+            background-color: #666;
+            font-weight: bold;
+        }
+        .content {
+            display: none;
+            flex-grow: 1;
+        }
+        .content.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+        }
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 95%;
+            margin-bottom: 20px;
+        }
+        .stats-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 16px;
+        }
+        .stats-group label {
+            font-size: 18px;
+        }
+        .stats-group input {
+            padding: 5px;
+            font-size: 14px;
+            width: 100px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .checkbox-group label {
+            font-size: 16px;
+        }
+        .dropdown-container {
+            margin-bottom: 10px;
+        }
+        .action-select {
+            padding: 5px;
+            font-size: 16px;
+        }
+        .grid-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            margin-top: 20px;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        .label {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: right;
+            align-self: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 120px;
+        }
+        .button-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            position: relative; /* To position the dropdown relative to the button */
+        }
+        .button {
+            padding: 10px;
+            font-size: 14px;
+            color: white;
+            background-color: green;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .button.grey {
+            background-color: grey;
+        }
+        .item-dropdown {
+            position: absolute;
+            top: 100%; /* Position below the button */
+            left: 0;
+            background-color: #444;
+            color: white;
+            padding: 5px 0;
+            border-radius: 5px;
+            z-index: 10; /* Ensure it's above other elements */
+            display: none; /* Hidden by default */
+            min-width: 150px; /* Adjust as needed */
+        }
+        .item-dropdown select {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .item-dropdown select option {
+            background-color: #555;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; margin: 10px;">Character Tracker</h1>
+
+    <div class="nav-bar">
+        <button class="active" onclick="showTab('primary')">Primary</button>
+        <button onclick="showTab('secondary')">Secondary</button>
+        <button onclick="showTab('tertiary')">Tertiary</button>
+    </div>
+
+    <div id="primary" class="content active">
+        <div class="dropdown-container">
+            <label for="primary-class-select">Class:</label>
+            <select id="primary-class-select" class="action-select" onchange="resetButtonDropdowns('primary'); createSpellButtons('primary')">
+                <option value="">-- Select Class --</option>
+                <option value="Cel Gen">Cel Gen</option>
+                <option value="Confinist">Confinist</option>
+                <option value="Druid">Druid</option>
+                <option value="Earth Gen">Earth Gen</option>
+                <option value="Elementalist">Elementalist</option>
+                <option value="Healer">Healer</option>
+                <option value="Necromancer">Necromancer</option>
+            </select>
+        </div>
+        <div class="stats-container">
+            <div class="stats-group">
+                <label for="body">Body:</label>
+                <input id="body" type="number" value="0">
+                <label for="armor">Armor:</label>
+                <input id="armor" type="number" value="0">
+            </div>
+            <div class="checkbox-group">
+                <label><input type="checkbox"> Spirit Armor</label>
+                <label><input type="checkbox"> Defend</label>
+                <label><input type="checkbox"> Toxin Shield</label>
+                <label><input type="checkbox"> Specialty Shield</label>
+            </div>
+        </div>
+        <div class="grid-container">
+            <div class="grid" id="primary-grid">
+            </div>
+        </div>
+    </div>
+
+    <div id="secondary" class="content">
+        <div class="dropdown-container">
+            <label for="secondary-class-select">Class:</label>
+            <select id="secondary-class-select" class="action-select" onchange="resetButtonDropdowns('secondary'); createSpellButtons('secondary')">
+                <option value="">-- Select Class --</option>
+                <option value="Cel Gen">Cel Gen</option>
+                <option value="Confinist">Confinist</option>
+                <option value="Druid">Druid</option>
+                <option value="Earth Gen">Earth Gen</option>
+                <option value="Elementalist">Elementalist</option>
+                <option value="Healer">Healer</option>
+                <option value="Necromancer">Necromancer</option>
+            </select>
+        </div>
+        <div class="grid-container">
+            <div class="grid" id="secondary-grid">
+            </div>
+        </div>
+    </div>
+
+    <div id="tertiary" class="content">
+        <div class="dropdown-container">
+            <label for="tertiary-class-select">Class:</label>
+            <select id="tertiary-class-select" class="action-select" onchange="resetButtonDropdowns('tertiary'); createSpellButtons('tertiary')">
+                <option value="">-- Select Class --</option>
+                <option value="Cel Gen">Cel Gen</option>
+                <option value="Confinist">Confinist</option>
+                <option value="Druid">Druid</option>
+                <option value="Earth Gen">Earth Gen</option>
+                <option value="Elementalist">Elementalist</option>
+                <option value="Healer">Healer</option>
+                <option value="Necromancer">Necromancer</option>
+            </select>
+        </div>
+        <div class="grid-container">
+            <div class="grid" id="tertiary-grid">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            const navButtons = document.querySelectorAll('.nav-bar button');
+            navButtons.forEach(button => button.classList.remove('active'));
+            document.querySelector(`.nav-bar button[onclick="showTab('${tabId}')"]`).classList.add('active');
+
+            createSpellButtons(tabId);
+        }
+
+        function createSpellButtons(tabId) {
+            const gridContainer = document.getElementById(`${tabId}-grid`);
+            gridContainer.innerHTML = ''; // Clear existing content
+
+            for (let level = 9; level >= 1; level--) {
+                const labelDiv = document.createElement('div');
+                labelDiv.classList.add('label');
+                labelDiv.textContent = `Level ${level}`;
+
+                const buttonRowDiv = document.createElement('div');
+                buttonRowDiv.classList.add('button-row');
+
+                for (let i = 0; i < 4; i++) {
+                    const button = document.createElement('button');
+                    button.classList.add('button');
+                    button.textContent = 'Pick a spell';
+                    button.ondblclick = function() {
+                        showItemDropdown(this, tabId);
+                    };
+                    const dropdownDiv = document.createElement('div');
+                    dropdownDiv.classList.add('item-dropdown');
+
+                    buttonRowDiv.appendChild(button);
+                    buttonRowDiv.appendChild(dropdownDiv);
+                }
+
+                gridContainer.appendChild(labelDiv);
+                gridContainer.appendChild(buttonRowDiv);
+            }
+        }
+
+        function showItemDropdown(buttonElement, tabId) {
+            const classSelect = document.getElementById(`${tabId}-class-select`);
+            const selectedClass = classSelect.value;
+            const dropdownContainer = buttonElement.nextElementSibling; // The div.item-dropdown
+
+            // Clear any existing dropdown
+            dropdownContainer.innerHTML = '';
+            dropdownContainer.style.display = 'none';
+
+            if (!selectedClass) {
+                alert('Please select a class first!');
+                return;
+            }
+
+            // Simulate fetching items based on the selected class
+            const itemsForClass = getItemsForClass(selectedClass);
+
+            if (itemsForClass && itemsForClass.length > 0) {
+                const selectElement = document.createElement('select');
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = '-- Select Item --';
+                selectElement.appendChild(defaultOption);
+
+                itemsForClass.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    selectElement.appendChild(option);
+                });
+
+                selectElement.onchange = function() {
+                    buttonElement.textContent = this.value || 'Pick a spell';
+                    dropdownContainer.style.display = 'none'; // Hide dropdown after selection
+                };
+
+                dropdownContainer.appendChild(selectElement);
+                dropdownContainer.style.display = 'block';
+            } else {
+                dropdownContainer.textContent = 'No items available for this class.';
+                dropdownContainer.style.display = 'block';
+                setTimeout(() => {
+                    dropdownContainer.style.display = 'none';
+                }, 1500); // Hide message after a short delay
+            }
+        }
+
+        function getItemsForClass(className) {
+            // This is where you would define the items available for each class
+            const classItems = {
+                'Cel Gen': ['Disarm', 'Magic Missile', 'Shield'],
+                'Confinist': ['Disarm', 'Eldritch Grasp', 'Shield'],
+                'Druid': ['Bless', 'Cure / Cause Light Wounds', 'Disarm', 'Light'],
+                'Earth Gen': ['Bless', 'Cure / Cause Light Wounds', 'Disarm', 'Light'],
+                'Elementalist': ['Disarm', 'Elemental Dart', 'Shield', 'Light'],
+                'Healer': ['Bless', 'Disarm', 'Heal Light Wounds', 'Light'],
+                'Necromancer': ['Bless', 'Cause Light Wounds', 'Disarm', 'Inflict Light Wounds', 'Light']
+                // Add more classes and their items here
+            };
+            return classItems[className] || [];
+        }
+
+        function resetButtonDropdowns(tabId) {
+            const tabContent = document.getElementById(tabId);
+            const dropdownContainers = tabContent.querySelectorAll('.button-row .item-dropdown');
+            dropdownContainers.forEach(container => {
+                container.innerHTML = '';
+                container.style.display = 'none';
+                const button = container.previousElementSibling;
+                if (button && button.classList.contains('button')) {
+                    button.textContent = 'Pick a spell';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
